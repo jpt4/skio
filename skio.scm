@@ -89,65 +89,79 @@
        (skio-diag b res) (skio-diag `(,a (,b ,c)) o)]
     )])))
 
-;;interpreter interface
+;;interpreter interfaces
+;standard forward interpretation
 (define (skio i o)
   (let* ([t0 (gensym)] [t1 (gensym)] [t2 (gensym)] 
          [init (list t2 (list t1 t0))])
     (fresh (a)
      (laso i a) (skio-fwd a init o))))
-
+;input synthesis (reverse interpretation)
 (define (skio-syn i o)
   (let* ([t0 (gensym)] [t1 (gensym)] [t2 (gensym)] 
          [init (list t2 (list t1 t0))])
     (skio-fwd i init o)))
 
 ;;alternative interpreter
-(define (skio-aux i o)
+(define (skio-alt i o)
   (fresh (a b resa resb res)
    (conde
     [(irredexo i) (== i o)]
     [(conde
-      [(io i res) (skio-aux res o)]
-      [(ko i res) (skio-aux res o)]
-      [(so i res) (skio-aux res o)]
-      [(== `(,a ,b) i) (skio-aux a resa) (skio-aux b resb)
-       (== `(,resa ,resb) res) (=/= i res) (skio-aux res o)]
-      [(== `(,a ,b) i) (skio-aux a resa) (skio-aux b resb)
+      [(io i res) (skio-alt res o)]
+      [(ko i res) (skio-alt res o)]
+      [(so i res) (skio-alt res o)]
+      [(== `(,a ,b) i) (skio-alt a resa) (skio-alt b resb)
+       (== `(,resa ,resb) res) (=/= i res) (skio-alt res o)]
+      [(== `(,a ,b) i) (skio-alt a resa) (skio-alt b resb)
        (== `(,resa ,resb) res) (== i res) (== i o)]
       )])))
 
+;;irreducible expressions for skio-alt
+(define (irredexo i)
+  (fresh (a b)
+         (conde
+          [(varo i)]
+          [(combo i)]
+          [(== `(K ,a) i) (irredexo a)]
+          [(== `(S ,a) i) (irredexo a)]
+          [(== `((S ,a) ,b) i) (irredexo a) (irredexo b)]
+          )))
 
 ;;Diagnostics instrumented interpreter core
-(define (skio-diag i d o)
-  (fresh (a b c resa resb resd resad resbd res exp diag)
+(define (skio-fwd-diag i d o)
+  (fresh (a b c e f g x y z resa resb resd resad resbd res exp diag)
    (conde
     [(== `(,a (,a ,b)) d) (== i a) (== i o) 
      #;(== `(stop i=,i a=,a b=,b d=,d) o)]
     [(conde
 ;    [(== '() i) (== i o)]
-      [(combo i) (== `(,i ,d) resd) (skio-diag i resd o)]
-      [(varo i) (== `(,i ,d) resd) (skio-diag i resd o)]
-      [(io i res) (== `(,res ,d) resd) (skio-diag res resd o) 
-       #;(skio-diag res resd diag)
+      [(combo i) #;(== `(,i ,d) resd) #;(skio-fwd-diag i resd o) (== i o)]
+      [(varo i) #;(== `(,i ,d) resd) #;(skio-fwd-diag i resd o) (== i o)]
+      [(io i res) (== `(,res ,d) resd) (skio-fwd-diag res resd o) 
+       #;(skio-fwd-diag res resd diag)
        #;(== `(so-lax i=,i res=,res d=,d resd=,resd diag=,diag) o)]
-      [(ko i res) (== `(,res ,d) resd) (skio-diag res resd o) 
-       #;(skio-diag res resd diag)
+      [(ko i res) (== `(,res ,d) resd) (skio-fwd-diag res resd o) 
+       #;(skio-fwd-diag res resd diag)
        #;(== `(so-lax i=,i res=,res d=,d resd=,resd diag=,diag) o)]
-      [(so i res) (== `(,res ,d) resd) (skio-diag res resd o) 
-       #;(skio-diag res resd diag)
+      [(so i res) (== `(,res ,d) resd) (skio-fwd-diag res resd o) 
+       #;(skio-fwd-diag res resd diag)
        #;(== `(so-lax i=,i res=,res d=,d resd=,resd diag=,diag) o)]
-      [(== `(,a ,b) i) (skio-diag a d resa) (skio-diag b d resb) 
-       (== `(,resa ,resb) res) (== `(,res ,d) resd) (skio-diag res resd o)
-       #;(skio-diag res resd diag)
-       #;(== `(pair i=,i a=,a b=,b resa=,resa resb=,resb res=,res resd=,resd d=,d diag=,diag) o)]
+      [(== `(,a ,b) i) (== `(,e (,f ,g)) d) (=/= e f) 
+       ;(=/= `(I ,x) `(,a ,b)) (=/= `((K ,x) ,y) `(,a ,b)) (=/= `(((S ,x) ,y) ,z) `(,a ,b))
+       (skio-fwd-diag a d resa) (skio-fwd-diag b d resb) 
+       (== `(,resa ,resb) res) (== `(,res ,d) resd) 
+       (skio-fwd-diag res resd o)
+       #;(skio-fwd-diag res resd diag)
+       #;(== `(pair i=,i a=,a b=,b x=,x y=,y e=,e f=,f g=,g resa=,resa resb=,resb res=,res resd=,resd d=,d diag=,diag) o)]
 #;      [(== `((,a ,b) ,c) i)
-       (skio-diag b res) (skio-diag `((,a ,res) ,c) o)]
+       (skio-fwd-diag b res) (skio-fwd-diag `((,a ,res) ,c) o)]
 #;      [(== `(,a (,b ,c)) i) 
-       (skio-diag b res) (skio-diag `(,a (,b ,c)) o)]
+       (skio-fwd-diag b res) (skio-fwd-diag `(,a (,b ,c)) o)]
     )])))
 
 ;;expose trace in single run
-(define (strict-skio-dt i d t o)
+#;(define (strict-skio-dt i d t o)
   (fresh (a b c resa resb resd resad resbd res exp diag)
          (conde
           [(== `(,a (,a ,b)) d) (== i a) (== d t) (== i o)
