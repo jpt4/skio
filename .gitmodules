@@ -1,0 +1,3 @@
+[submodule "miniKanren-with-symbolic-constraints"]
+	path = miniKanren-with-symbolic-constraints
+	url = https://www.github.com/jpt4/miniKanren-with-symbolic-constraints
