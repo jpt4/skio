@@ -11,7 +11,7 @@ git clone [this-repository]
 
 [launch Chez Scheme]
 
-/> (load "skio.scm")
+/ > (load "skio.scm")
 
 ### Contents
 ````skio```` interprets input expressions regardless of parenthesization, converting them to left-associative normal form if necessary, and is best used for forward evaluation.
