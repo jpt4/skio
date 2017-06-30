@@ -4,16 +4,16 @@
 A naive, purely relational interpreter for the SKI Combinator Calculus, written in miniKanren.
 
 ### Compatibility
-This project was developed against Chez Scheme v9.4-1, and the copy of Will Byrd's miniKanren-with-symbolic-constraints included in this repository. It has not been tested under any other configuration.
+This project is developed against Chez Scheme v9.4-1, and the copy of Will Byrd's miniKanren-with-symbolic-constraints included in this repository. It has not been tested under any other configuration.
 
 ### Setup
 git clone [this-repository]
 
 [launch Chez Scheme]
 
-> (load "skio.scm")
+/> (load "skio.scm")
 
-### Use
+### Contents
 ````skio```` interprets input expressions regardless of parenthesization, converting them to left-associative normal form if necessary, and is best used for forward evaluation.
 
 ````skio-syn```` elides the left-associativity preprocessor, thus requiring fully parenthesized input expressions, to allow for greater variety during reverse expression synthesis.
