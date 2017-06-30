@@ -117,60 +117,59 @@
 
 ;;;UNDER CONSTRUCTION FROM THIS POINT ONWARDS
 ;;Diagnostics instrumented interpreter core
-#;(define (skio-core-diag i t o)
-  (fresh (a b c d e resa resb rest res exp diag)
+(define (skio-core-diag i t o)
+  (fresh (a b c d e t0 t1 t2 resa resb rest res diag)
    (conde
-    [(== `(,a (,a ,b)) d) (== i a) (== i o) 
-     #;(== `(stop i=,i a=,a b=,b d=,d) o)]
-    [(conde
-;    [(== '() i) (== i o)]
-      [(combo i) #;(== `(,i ,d) resd) #;(skio-core-diag i resd o) (== i o)]
-      [(varo i) #;(== `(,i ,d) resd) #;(skio-core-diag i resd o) (== i o)]
-      [(io i res) (== `(,res ,d) resd) (skio-core-diag res resd o) 
-       #;(skio-core-diag res resd diag)
-       #;(== `(so-lax i=,i res=,res d=,d resd=,resd diag=,diag) o)]
-      [(ko i res) (== `(,res ,d) resd) (skio-core-diag res resd o) 
-       #;(skio-core-diag res resd diag)
-       #;(== `(so-lax i=,i res=,res d=,d resd=,resd diag=,diag) o)]
-      [(so i res) (== `(,res ,d) resd) (skio-core-diag res resd o) 
-       #;(skio-core-diag res resd diag)
-       #;(== `(so-lax i=,i res=,res d=,d resd=,resd diag=,diag) o)]
-      [(== `(,a ,b) i) (== `(,e (,f ,g)) d) (=/= e f) 
-       ;(=/= `(I ,x) `(,a ,b)) (=/= `((K ,x) ,y) `(,a ,b)) (=/= `(((S ,x) ,y) ,z) `(,a ,b))
-       (skio-core-diag a d resa) (skio-core-diag b d resb) 
-       (== `(,resa ,resb) res) (== `(,res ,d) resd) 
-       (skio-core-diag res resd o)
-       #;(skio-core-diag res resd diag)
-       #;(== `(pair i=,i a=,a b=,b x=,x y=,y e=,e f=,f g=,g resa=,resa resb=,resb res=,res resd=,resd d=,d diag=,diag) o)]
-#;      [(== `((,a ,b) ,c) i)
-       (skio-core-diag b res) (skio-core-diag `((,a ,res) ,c) o)]
-#;      [(== `(,a (,b ,c)) i) 
-       (skio-core-diag b res) (skio-core-diag `(,a (,b ,c)) o)]
-    )])))
+    [(== `(,a (,a ,b)) t) (== i a) (== i o) 
+     #;(== `(stop i=,i a=,a b=,b t=,t) o)]
+    [(== `(,t2 (,t1 ,t0)) t) (=/= t2 t1)
+     #;(== `(go i=,i t=,t t2=,t2 t1=,t1 t0=,t0) o)
+     (conde
+      [(combo i) (== i o) 
+       #;(== `(combo i=,i) o)]
+      [(varo i) (== i o)
+       #;(== `(varo i=,i) o)]
+      [(io i res) (== `(,res ,t) rest) (skio-core-diag res rest o) 
+       #;(skio-core-diag res rest diag)
+       #;(== `(io i=,i res=,res t=,t rest=,rest diag=,diag) o)]
+      [(ko i res) (== `(,res ,t) rest) (skio-core-diag res rest o) 
+       #;(skio-core-diag res rest diag)
+       #;(== `(ko i=,i res=,res t=,t rest=,rest diag=,diag) o)]
+      [(so i res) (== `(,res ,t) rest) (skio-core-diag res rest o) 
+       #;(skio-core-diag res rest diag)
+       #;(== `(so i=,i res=,res t=,t rest=,rest diag=,diag) o)]
+      [(== `(,a ,b) i) 
+       (skio-core-diag a t resa) (skio-core-diag b t resb) 
+       (== `(,resa ,resb) res) (== `(,res ,t) rest) 
+       (skio-core-diag res rest o)
+       #;(skio-core-diag res rest diag)
+       #;(== `(pair i=,i a=,a b=,b t=,t resa=,resa resb=,resb res=,res 
+       rest=,rest diag=,diag) o)]
+      )])))
 
 ;;expose trace in single run
 #;(define (strict-skio-dt i d t o)
-  (fresh (a b c resa resb resd resad resbd res exp diag)
+  (fresh (a b c resa resb rest resad resbd res exp diag)
          (conde
           [(== `(,a (,a ,b)) d) (== i a) (== d t) (== i o)
-           #;(== `(stop i=,i a=,a b=,b d=,d t=,t) o)]
+           #;(== `(stop i=,i a=,a b=,b t=,t t=,t) o)]
           [(conde
            ;    [(== '() i) (== i o)]
-            [(combo i) (== `(,i ,d) resd) (strict-skio i resd t o)]
-            [(varo i) (== `(,i ,d) resd) (strict-skio i resd t o)]
-            [(strict-io i res) (== `(,res ,d) resd) (strict-skio res resd t o)
-             #;(strict-skio res resd t diag)
-             #;(== `(so i=,i res=,res d=,d resd=,resd t=,t diag=,diag) o)]
-            [(strict-ko i res) (== `(,res ,d) resd) #;(strict-skio res resd t o)
-             (strict-skio res resd t diag)
-             (== `(so i=,i res=,res d=,d resd=,resd t=,t diag=,diag) o)]
-            [(strict-so i res) (== `(,res ,d) resd) (strict-skio res resd t o)
-             #;(strict-skio res resd t diag)
-             #;(== `(so i=,i res=,res d=,d resd=,resd t=,t diag=,diag) o)]
+            [(combo i) (== `(,i ,t) rest) (strict-skio i rest t o)]
+            [(varo i) (== `(,i ,t) rest) (strict-skio i rest t o)]
+            [(strict-io i res) (== `(,res ,t) rest) (strict-skio res rest t o)
+             #;(strict-skio res rest t diag)
+             #;(== `(so i=,i res=,res t=,t rest=,rest t=,t diag=,diag) o)]
+            [(strict-ko i res) (== `(,res ,t) rest) #;(strict-skio res rest t o)
+             (strict-skio res rest t diag)
+             (== `(so i=,i res=,res t=,t rest=,rest t=,t diag=,diag) o)]
+            [(strict-so i res) (== `(,res ,t) rest) (strict-skio res rest t o)
+             #;(strict-skio res rest t diag)
+             #;(== `(so i=,i res=,res t=,t rest=,rest t=,t diag=,diag) o)]
             [(== `(,a ,b) i) (strict-skio a d t resa) (strict-skio b d t resb)
-             (== `(,resa ,resb) res) (== `(,res ,d) resd) #;(strict-skio res resd t o)
-             #;(strict-skio res resd t diag)
-             (== `(pair i=,i a=,a b=,b resa=,resa resb=,resb res=,res resd=,resd d=,d t=,t diag=,diag) o)]
+             (== `(,resa ,resb) res) (== `(,res ,t) rest) #;(strict-skio res rest t o)
+             #;(strict-skio res rest t diag)
+             (== `(pair i=,i a=,a b=,b resa=,resa resb=,resb res=,res rest=,rest t=,t t=,t diag=,diag) o)]
             #;      [(== `((,a ,b) ,c) i)
             (strict-skio b res) (strict-skio `((,a ,res) ,c) o)]
             #;      [(== `(,a (,b ,c)) i) 
