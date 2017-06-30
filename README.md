@@ -24,17 +24,17 @@ git clone [this-repository]
 
 An input expressions is a quoted (potentially nested) list of symbols, including the reserved symbols ````S````, ````K````, and ````I````.
 
-For forward evaluation with ````skio````, set ````run```` to produce a single answer, i.e. ````(run 1 (q) (skio EXP q))````
+For forward evaluation with `skio`, set ````run```` to produce a single answer, i.e. ````(run 1 (q) (skio EXP q))````
 
 ### Examples
 Booleans:
-> (define T 'K)
-> T
+\> (define T 'K)
+\> T
 K
-> (run 1 (q) (skio `(,T a b) q))
+\> (run 1 (q) (skio `(,T a b) q))
 (a)
-> (define F '(S K))
-> (run 1 (q) (skio `(,F a b) q))
+\> (define F '(S K))
+\> (run 1 (q) (skio `(,F a b) q))
 (b)
 
 
