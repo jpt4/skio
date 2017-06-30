@@ -59,33 +59,35 @@
 
 ;;core interpreter
 (define (skio-core i t o)
-  (fresh (a b c d e resa resb resd res)
+  (fresh (a b c d e t0 t1 t2 resa resb rest res diag)
    (conde
     [(== `(,a (,a ,b)) t) (== i a) (== i o)]
-    [(conde
+    [(== `(,t2 (,t1 ,t0)) t) (=/= t2 t1)
+     (conde
       [(combo i) (== i o)]
       [(varo i) (== i o)]
-      [(io i res) (== `(,res ,d) resd) (skio-core res resd o)]
-      [(ko i res) (== `(,res ,d) resd) (skio-core res resd o)]
-      [(so i res) (== `(,res ,d) resd) (skio-core res resd o)]
-      [(== `(,a ,b) i) (== `(,c (,d ,e)) t) (=/= c d)
-       (skio-core a d resa) (skio-core b d resb) 
-       (== `(,resa ,resb) res) (== `(,res ,d) resd) 
-       (skio-core res resd o)]
-    )])))
+      [(io i res) (== `(,res ,t) rest) (skio-core res rest o)]
+      [(ko i res) (== `(,res ,t) rest) (skio-core res rest o)]
+      [(so i res) (== `(,res ,t) rest) (skio-core res rest o)]
+      [(== `(,a ,b) i) 
+       (skio-core a t resa) (skio-core b t resb)
+       (== `(,resa ,resb) res) (== `(,res ,t) rest)
+       (skio-core res rest o)]
+      )])))
 
-;;interpreter interfaces
-;standard forward interpretation
-(define (skio i o)
-  (let* ([t0 (gensym)] [t1 (gensym)] [t2 (gensym)] 
+;;interpreter interfaces - note, contaminates mK relational logic with Scheme
+;input evaluation (forward interpretation)
+(define (skio exp)
+  (let* ([t0 (gensym)] [t1 (gensym)] [t2 (gensym)]
          [init (list t2 (list t1 t0))])
-    (fresh (a)
-     (laso i a) (skio-core a init o))))
-;input synthesis (reverse interpretation)
-(define (skio-syn i o)
-  (let* ([t0 (gensym)] [t1 (gensym)] [t2 (gensym)] 
+    (run 1 (q) (fresh (i)
+                (laso exp i) (skio-core i init q)))))
+
+;input synthesis (reverse interpretation) - no laso preprocessing
+(define (skio-syn exp num)
+  (let* ([t0 (gensym)] [t1 (gensym)] [t2 (gensym)]
          [init (list t2 (list t1 t0))])
-    (skio-core i init o)))
+    (run num (q) (skio-core q init exp))))
 
 ;;alternative interpreter, does better at synthesis than evaluation
 (define (skio-alt i o)
@@ -116,7 +118,7 @@
 ;;;UNDER CONSTRUCTION FROM THIS POINT ONWARDS
 ;;Diagnostics instrumented interpreter core
 #;(define (skio-core-diag i t o)
-  (fresh (a b c d e f g x y z resa resb resd resad resbd res exp diag)
+  (fresh (a b c d e resa resb rest res exp diag)
    (conde
     [(== `(,a (,a ,b)) d) (== i a) (== i o) 
      #;(== `(stop i=,i a=,a b=,b d=,d) o)]
