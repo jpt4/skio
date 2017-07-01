@@ -66,12 +66,12 @@
      (conde
       [(combo i) (== i o)]
       [(varo i) (== i o)]
-      [(io i res) (== `(,res ,t) rest) (skio-core res rest o)]
-      [(ko i res) (== `(,res ,t) rest) (skio-core res rest o)]
-      [(so i res) (== `(,res ,t) rest) (skio-core res rest o)]
+      [(io i res) (== `(,res (,t2 ,t1)) rest) (skio-core res rest o)]
+      [(ko i res) (== `(,res (,t2 ,t1)) rest) (skio-core res rest o)]
+      [(so i res) (== `(,res (,t2 ,t1)) rest) (skio-core res rest o)]
       [(== `(,a ,b) i) 
        (skio-core a t resa) (skio-core b t resb)
-       (== `(,resa ,resb) res) (== `(,res ,t) rest)
+       (== `(,resa ,resb) res) (== `(,res (,t2 ,t1)) rest)
        (skio-core res rest o)]
       )])))
 
@@ -115,7 +115,6 @@
           [(== `((S ,a) ,b) i) (irredexo a) (irredexo b)]
           )))
 
-;;;UNDER CONSTRUCTION FROM THIS POINT ONWARDS
 ;;Diagnostics instrumented interpreter core
 (define (skio-core-diag i t o)
   (fresh (a b c d e t0 t1 t2 resa resb rest res diag)
@@ -129,24 +128,25 @@
        #;(== `(combo i=,i) o)]
       [(varo i) (== i o)
        #;(== `(varo i=,i) o)]
-      [(io i res) (== `(,res ,t) rest) (skio-core-diag res rest o) 
+      [(io i res) (== `(,res (,t2 ,t1)) rest) (skio-core-diag res rest o) 
        #;(skio-core-diag res rest diag)
        #;(== `(io i=,i res=,res t=,t rest=,rest diag=,diag) o)]
-      [(ko i res) (== `(,res ,t) rest) (skio-core-diag res rest o) 
+      [(ko i res) (== `(,res (,t2 ,t1)) rest) (skio-core-diag res rest o) 
        #;(skio-core-diag res rest diag)
        #;(== `(ko i=,i res=,res t=,t rest=,rest diag=,diag) o)]
-      [(so i res) (== `(,res ,t) rest) (skio-core-diag res rest o) 
+      [(so i res) (== `(,res (,t2 ,t1)) rest) (skio-core-diag res rest o) 
        #;(skio-core-diag res rest diag)
        #;(== `(so i=,i res=,res t=,t rest=,rest diag=,diag) o)]
       [(== `(,a ,b) i) 
        (skio-core-diag a t resa) (skio-core-diag b t resb) 
-       (== `(,resa ,resb) res) (== `(,res ,t) rest) 
+       (== `(,resa ,resb) res) (== `(,res (,t2 ,t1)) rest) 
        (skio-core-diag res rest o)
        #;(skio-core-diag res rest diag)
        #;(== `(pair i=,i a=,a b=,b t=,t resa=,resa resb=,resb res=,res 
        rest=,rest diag=,diag) o)]
       )])))
 
+;;;UNDER CONSTRUCTION FROM THIS POINT ONWARDS
 ;;expose trace in single run
 #;(define (strict-skio-dt i d t o)
   (fresh (a b c resa resb rest resad resbd res exp diag)
@@ -157,17 +157,17 @@
            ;    [(== '() i) (== i o)]
             [(combo i) (== `(,i ,t) rest) (strict-skio i rest t o)]
             [(varo i) (== `(,i ,t) rest) (strict-skio i rest t o)]
-            [(strict-io i res) (== `(,res ,t) rest) (strict-skio res rest t o)
+            [(strict-io i res) (== `(,res (,t2 ,t1)) rest) (strict-skio res rest t o)
              #;(strict-skio res rest t diag)
              #;(== `(so i=,i res=,res t=,t rest=,rest t=,t diag=,diag) o)]
-            [(strict-ko i res) (== `(,res ,t) rest) #;(strict-skio res rest t o)
+            [(strict-ko i res) (== `(,res (,t2 ,t1)) rest) #;(strict-skio res rest t o)
              (strict-skio res rest t diag)
              (== `(so i=,i res=,res t=,t rest=,rest t=,t diag=,diag) o)]
-            [(strict-so i res) (== `(,res ,t) rest) (strict-skio res rest t o)
+            [(strict-so i res) (== `(,res (,t2 ,t1)) rest) (strict-skio res rest t o)
              #;(strict-skio res rest t diag)
              #;(== `(so i=,i res=,res t=,t rest=,rest t=,t diag=,diag) o)]
             [(== `(,a ,b) i) (strict-skio a d t resa) (strict-skio b d t resb)
-             (== `(,resa ,resb) res) (== `(,res ,t) rest) #;(strict-skio res rest t o)
+             (== `(,resa ,resb) res) (== `(,res (,t2 ,t1)) rest) #;(strict-skio res rest t o)
              #;(strict-skio res rest t diag)
              (== `(pair i=,i a=,a b=,b resa=,resa resb=,resb res=,res rest=,rest t=,t t=,t diag=,diag) o)]
             #;      [(== `((,a ,b) ,c) i)
