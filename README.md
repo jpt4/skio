@@ -61,27 +61,18 @@ For both `skio` and `skio-syn`, the number of results requested must be included
 
 `    (((S (K a)) ((S I) I)) ((S (K a)) ((S I) I))))`
 
-`> (skio-syn 'a 10)`
-
-`(a`
-
-`(I a)`
-
-`((K a) _.0)`
-
-`(I (I a))`
-
-`(I ((K a) _.0))`
-
-`((K (I a)) _.0)`
-
-`(I (I (I a)))`
-
-`((K ((K a) _.0)) _.1)`
-
-`(I (I ((K a) _.0)))`
-
-`(((S K) _.0) a))`
+```> (skio-syn 'a 10)
+(a
+(I a)
+((K a) _.0)
+(I (I a))
+(I ((K a) _.0))
+((K (I a)) _.0)
+(I (I (I a)))
+((K ((K a) _.0)) _.1)
+(I (I ((K a) _.0)))
+(((S K) _.0) a))
+```
 
 
 
