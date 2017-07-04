@@ -29,17 +29,17 @@ An input expression is a quoted (potentially nested) list of symbols, including 
 For both `skio` and `skio-syn`, the number of results requested must be included, e.g. `(skio EXP NUM)`. Because the evaluation order of miniKanren is unspecified, the most reduced answer may not be the first produced, especially for expressions which simulate recursion.
 
 ### Examples
-`> (skio '(S I I a) 1)
+`> (skio '(S I I a) 1)`
 
-((a a))
+`((a a))`
 
-\> (skio '(S I I (S I I)) 1)
+`> (skio '(S I I (S I I)) 1)`
 
-((((S I) I) ((S I) I)))`
+`((((S I) I) ((S I) I)))`
 
-\> (skio '(S (K a) (S I I) b) 1)
+`> (skio '(S (K a) (S I I) b) 1)`
 
-((a (b b)))
+`((a (b b)))`
 
 \> (define beta '(S (K a) (S I I)))
 
