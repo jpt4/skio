@@ -41,27 +41,27 @@ For both `skio` and `skio-syn`, the number of results requested must be included
 
 `((a (b b)))`
 
-\> (define beta '(S (K a) (S I I)))
+`> (define beta '(S (K a) (S I I)))`
 
-\> beta
+`> beta`
 
-(S (K a) (S I I))
+`(S (K a) (S I I))`
 
-\> (define exp (list 'S 'I 'I beta))
+`> (define exp (list 'S 'I 'I beta))`
 
-\> exp
+`> exp`
 
-(S I I (S (K a) (S I I)))
+`(S I I (S (K a) (S I I)))`
 
-\> (skio exp 3)
+`> (skio exp 3)`
 
-((((S I) I) ((S (K a)) ((S I) I)))
+`((((S I) I) ((S (K a)) ((S I) I)))`
 
-  (((S I) I) ((S (K a)) ((S I) I)))
+`  (((S I) I) ((S (K a)) ((S I) I)))`
 
-    (((S (K a)) ((S I) I)) ((S (K a)) ((S I) I))))
+`    (((S (K a)) ((S I) I)) ((S (K a)) ((S I) I))))`
 
-\> (skio-syn 'a 10)
+`> (skio-syn 'a 10)`
 
 (a
 
