@@ -24,27 +24,54 @@ $ [launch Chez Scheme]
 
 `io`, `ko`, and `so` each perform a single step of the eponymous reduction on fully left-associative expressions; useful for checking manual derivations. 
 
-An input expressions is a quoted (potentially nested) list of symbols, including the reserved symbols `S`, `K`, and `I`.
+An input expression is a quoted (potentially nested) list of symbols, including the reserved symbols `S`, `K`, and `I`.
 
-For forward evaluation with `skio`, set `run` to produce a single answer, i.e. `(run 1 (q) (skio EXP q))`
+For both `skio` and `skio-syn`, the number of results requested must be included, e.g. `(skio EXP NUM)`. Because the evaluation order of miniKanren is unspecified, the most reduced answer may not be the first produced, especially for expressions which simulate recursion.
 
 ### Examples
-Booleans:
-\> (define T 'K)
+\> (skio '(S I I a) 1)
 
-\> T
+((a a))
 
-K
+\> (skio '(S I I (S I I)) 1)
 
-\> (run 1 (q) (skio `(,T a b) q))
+((((S I) I) ((S I) I)))
 
-(a)
+\> (skio '(S (K a) (S I I) b) 1)
 
-\> (define F '(S K))
+((a (b b)))
 
-\> (run 1 (q) (skio `(,F a b) q))
+\> (define beta '(S (K a) (S I I)))
 
-(b)
+\> beta
+
+(S (K a) (S I I))
+
+\> (define exp (list 'S 'I 'I beta))
+
+\> exp
+
+(S I I (S (K a) (S I I)))
+
+\> (skio exp 3)
+
+((((S I) I) ((S (K a)) ((S I) I)))
+  (((S I) I) ((S (K a)) ((S I) I)))
+    (((S (K a)) ((S I) I)) ((S (K a)) ((S I) I))))
+
+\> (skio-syn 'a 10)
+
+(a           
+(I a) 
+((K a) _.0) 
+(I (I a)) 
+(I ((K a) _.0)) 
+((K (I a)) _.0)
+(I (I (I a))) 
+((K ((K a) _.0)) _.1) 
+(I (I ((K a) _.0)))
+(((S K) _.0) a))
+
 
 
 
