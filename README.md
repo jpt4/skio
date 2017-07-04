@@ -28,7 +28,7 @@ $ [launch Chez Scheme]
 
 An input expression is a quoted (potentially nested) list of symbols, including the reserved symbols `S`, `K`, and `I`.
 
-For both `skio` and `skio-syn`, the number of results requested must be included, e.g. `(skio EXP NUM)`. Because the evaluation order of miniKanren is unspecified, the most reduced answer may not be the first produced, especially for expressions which simulate recursion.
+For both `skio` and `skio-syn`, the number of results requested must be included, e.g. `(skio EXP NUM)`. *Because the evaluation order of miniKanren is unspecified, the most reduced answer may not be the first produced, especially for expressions which simulate recursion.*
 
 ### Examples
 ```
