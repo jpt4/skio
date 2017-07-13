@@ -10,7 +10,7 @@ This project is developed against Chez Scheme v9.4-1, and the copy of Will Byrd'
 ```
 $ git clone [this-repository]
 
-$ cd [clone directory]
+$ cd [repo-directory]
 
 $ [launch Chez Scheme]
 
