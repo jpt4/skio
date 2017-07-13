@@ -4,7 +4,7 @@
 A naive, purely relational interpreter for the SKI Combinator Calculus, written in miniKanren.
 
 ### Compatibility
-This project is developed against Chez Scheme v9.4-1, and the copy of Will Byrd's miniKanren-with-symbolic-constraints included in this repository. It has not been tested under any other configuration.
+This project is developed on Arch Linux against Chez Scheme v9.4-1, and the copy of Will Byrd's miniKanren-with-symbolic-constraints included in this repository. It has not been tested under any other configuration.
 
 ### Setup
 ```
@@ -28,7 +28,7 @@ $ [launch Chez Scheme]
 
 An input expression is a quoted (potentially nested) list of symbols, including the reserved symbols `S`, `K`, and `I`.
 
-For both `skio` and `skio-syn`, the number of results requested must be included, e.g. `(skio EXP NUM)`. *Because the evaluation order of miniKanren is unspecified, the most reduced answer may not be the first produced, especially for expressions which simulate recursion.*
+For both `skio` and `skio-syn`, the number of results requested must be included, e.g. `(skio EXP NUM)`. *Because the evaluation order of miniKanren is unspecified, the most reduced answer may not be the first produced, especially for expressions which simulate recursion.* However, if an answer exists, then their exists a `NUM` value large enough such that the result set will include it.
 
 ### Examples
 ```
